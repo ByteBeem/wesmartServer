@@ -159,6 +159,25 @@ app.post('/upload', (req, res) => {
   res.status(200).json({ message: "Post created successfully." });
 });
 
+app.post('/uploadText', (req, res) => {
+  const postData = req.body;
+
+  
+  if (!postData.caption) {
+    postData.caption = "";
+  }
+  
+  const userRef = db.ref('posts').push();
+  userRef.set({
+    
+    caption: postData.caption,
+    time: postData.timestamp,
+    content_type: postData.content_type
+  });
+
+  res.status(200).json({ message: "Post created successfully." });
+});
+
 
 app.get('/posts', async (req, res) => {
   try {
