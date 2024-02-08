@@ -154,6 +154,18 @@ app.post('/upload', (req, res) => {
     res.status(200).json({ message: "Post created successfully." });
 });
 
+app.get('/posts', async (req, res) => {
+  try {
+    const postsSnapshot = await db.ref('posts').once('value');
+    const postsData = postsSnapshot.val();
+    const postsArray = Object.values(postsData);
+    res.json(postsArray);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.get("/balance", async (req, res) => {
   const token = req.header("Authorization");
 
