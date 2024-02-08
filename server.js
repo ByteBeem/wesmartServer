@@ -142,18 +142,23 @@ const loginLimiter = rateLimit({
 
 app.post('/upload', (req, res) => {
   const postData = req.body;
-  
-    const userRef = db.ref('posts').push();
-    userRef.set({
-      imageUrl: postData.imageUrl,
-      caption: postData.caption,
-      time: postData.timestamp,
-      content_type: postData.content_type
-      
-    });
 
-    res.status(200).json({ message: "Post created successfully." });
+  
+  if (!postData.caption) {
+    postData.caption = "";
+  }
+  
+  const userRef = db.ref('posts').push();
+  userRef.set({
+    imageUrl: postData.imageUrl,
+    caption: postData.caption,
+    time: postData.timestamp,
+    content_type: postData.content_type
+  });
+
+  res.status(200).json({ message: "Post created successfully." });
 });
+
 
 app.get('/posts', async (req, res) => {
   try {
