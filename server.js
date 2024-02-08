@@ -29,8 +29,7 @@ const firebaseServiceAccount = require("./key.json");
 
 firebase.initializeApp({
   credential: firebase.credential.cert(firebaseServiceAccount),
-  databaseURL: "https://wesmart-a981c-default-rtdb.asia-southeast1.firebasedatabase.app
-",
+  databaseURL: "https://wesmart-a981c-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
 
 const db = firebase.database();
