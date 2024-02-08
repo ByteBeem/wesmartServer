@@ -148,6 +148,7 @@ app.post('/upload', (req, res) => {
       imageUrl: postData.imageUrl,
       caption: postData.caption,
       time: postData.timestamp,
+      content_type: postData.content_type
       
     });
 
