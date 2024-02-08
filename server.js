@@ -142,11 +142,16 @@ const loginLimiter = rateLimit({
 
 app.post('/upload', (req, res) => {
   const postData = req.body;
+  
+    const userRef = db.ref('posts').push();
+    userRef.set({
+      imageUrl: postData.imageUrl,
+      caption: postData.caption,
+      time: postData.timestamp,
+      
+    });
 
-  // Process postData as needed
-  console.log('Received postData:', postData);
-
-  res.send('Data received successfully');
+    res.status(200).json({ message: "Post created successfully." });
 });
 
 app.get("/balance", async (req, res) => {
