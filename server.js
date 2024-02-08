@@ -142,6 +142,15 @@ const loginLimiter = rateLimit({
   message: "Too many login attempts from this IP, please try again later",
 });
 
+app.post('/upload', (req, res) => {
+  const postData = req.body;
+
+  // Process postData as needed
+  console.log('Received postData:', postData);
+
+  res.send('Data received successfully');
+});
+
 app.get("/balance", async (req, res) => {
   const token = req.header("Authorization");
 
