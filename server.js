@@ -73,52 +73,30 @@ app.use((req, res, next) => {
 
 // Signup endpoint
 app.post("/signup", async (req, res) => {
-  const { fullName, surname, cell, idNumber, password, country } = req.body;
+   const postData = req.body;
+  const fullname=postData.name;
+  const cell=postData.phoneNumber;
+  const password=postData.password;
 
   try {
-    const numberId = generateRandomNumber();
-    let fixedIdNumber = idNumber || numberId;
-    let amount;  
-
-    const usAmount = "10.00";
-    const saAmount = "25.00";
-
-    if (country !== "ZA") {
-      amount = usAmount;
-    } else {
-      amount = saAmount;
-    }
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(409).json({ error: "Invalid input. Please check your information." });
-    }
-
-    if (!fullName || !surname || !cell || !password || !country) {
-      return res.status(409).json({ error: "All fields are required." });
-    }
+   
 
     const cellSnapshot = await db.ref('users').orderByChild('cell').equalTo(cell).once('value');
     if (cellSnapshot.exists()) {
       return res.status(201).json({ error: "Cell number already registered." });
     }
 
-    const idNumberSnapshot = await db.ref('users').orderByChild('idNumber').equalTo(fixedIdNumber).once('value');
-    if (idNumberSnapshot.exists()) {
-      return res.status(208).json({ error: "ID number already registered." });
-    }
-
+   
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const userRef = db.ref('users').push();
     userRef.set({
       name: fullName,
-      surname: surname,
+     
       cell: cell,
-      idNumber: fixedIdNumber,
-      country: country,
+      
       password: hashedPassword,
-      balance: amount,
+     
     });
 
     res.status(200).json({ message: "User created successfully." });
@@ -208,12 +186,9 @@ app.get('/posts', async (req, res) => {
 
 
 app.post("/login", loginLimiter, async (req, res) => {
-  const { cell, password, token } = req.body;
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: "Invalid input. Please check your data." });
-  }
+  const postData = req.body;
+  const cell = postData.phoneNumber;
+   const password = postData.password;
 
   try {
     if (token) {
@@ -221,7 +196,7 @@ app.post("/login", loginLimiter, async (req, res) => {
       try {
         decodedToken = jwt.verify(token, secretKey);
       } catch (err) {
-        // Handle TokenExpiredError and refresh token logic
+        
       }
 
       const userId = decodedToken.userId;
