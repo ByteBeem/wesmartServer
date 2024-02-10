@@ -191,7 +191,7 @@ app.post("/login", loginLimiter, async (req, res) => {
     const userValues = Object.values(userData);
 
     if (!userValues || userValues.length === 0) {
-      return res.status(401).json({ error: "User not found." });
+      return res.status(409).json({ error: "User not found." });
     }
 
     const user = userValues[0];
