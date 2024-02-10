@@ -175,6 +175,7 @@ app.post('/uploadText', (req, res) => {
     
     caption: postData.caption,
     time: postData.timestamp,
+    user : postData.token,
     content_type: postData.content_type
   });
 
@@ -207,6 +208,34 @@ app.get('/posts', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.get('/Userposts', async (req, res) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const token = authHeader.substring(7); 
+    const postsSnapshot = await db.ref('posts').once('value');
+    const postsData = postsSnapshot.val();
+    const postsArray = Object.values(postsData);
+
+    // Filter posts based on token
+    const filteredPosts = postsArray.filter(post => post.user === token);
+
+    // Shuffle the filtered posts
+    for (let i = 0; i < 3; i++) {
+      shuffleArray(filteredPosts);
+    }
+
+    res.json(filteredPosts);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 
 
