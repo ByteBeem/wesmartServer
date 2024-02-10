@@ -248,11 +248,10 @@ app.post("/login", loginLimiter, async (req, res) => {
       const newToken = jwt.sign(
         {
           userId: user.id,
-          id: user.id,
+      
           name: user.name,
           cell: user.cell,
-          balance: user.balance,
-          surname: user.surname,
+          
         },
         secretKey,
         { expiresIn: "7D" }
@@ -270,11 +269,10 @@ app.post("/login", loginLimiter, async (req, res) => {
       const newToken = jwt.sign(
         {
           userId: user.id,
-          id: user.id,
+          
           name: user.name,
           cell: user.cell,
-          balance: user.balance,
-          surname: user.surname,
+          
         },
         secretKey,
         { expiresIn: "7D" }
