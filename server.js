@@ -141,17 +141,24 @@ app.get("/getUserData", async (req, res) => {
   try {
     const decodedToken = jwt.verify(tokenValue, secretKey);
 
-    const cell =decodedToken.cell;
+    // Check if the decoded token contains the expected fields
+    if (!decodedToken.cell || !decodedToken.name) {
+      return res.status(400).json({ error: "Malformed token. Missing required fields." });
+    }
+
+    const cell = decodedToken.cell;
     const name = decodedToken.name;
 
-
-
-    return res.status(200).json({ name: name  , cell: cell}); 
+    return res.status(200).json({ name: name, cell: cell });
   } catch (err) {
     console.error("Error fetching user info:", err);
+    if (err instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ error: "Invalid token." });
+    }
     return res.status(500).json({ error: "Internal server error. Please try again later." });
   }
 });
+
 
 
 app.post('/uploadText', (req, res) => {
