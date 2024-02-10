@@ -186,33 +186,41 @@ app.get('/posts', async (req, res) => {
 
 
 app.post("/login", loginLimiter, async (req, res) => {
-  const postData = req.body;
-  const cell = postData.phoneNumber;
-   const password = postData.password;
+  const { phoneNumber, password } = req.body;
 
   try {
-    if (token) {
+    const snapshot = await db.ref('users').orderByChild('cell').equalTo(phoneNumber).once('value');
+    const userData = snapshot.val();
+
+    if (!userData) {
+      return res.status(401).json({ error: "User not found." });
+    }
+
+    const userValues = Object.values(userData);
+
+    if (!userValues || userValues.length === 0) {
+      return res.status(401).json({ error: "User not found." });
+    }
+
+    const user = userValues[0];
+
+    if (user.token) {
       let decodedToken;
       try {
-        decodedToken = jwt.verify(token, secretKey);
+        decodedToken = jwt.verify(user.token, secretKey);
       } catch (err) {
-        
+        // Handle token verification error
+        console.error("Token verification error:", err);
+        return res.status(500).json({ error: "Token verification failed." });
       }
 
-      const userId = decodedToken.userId;
-      const snapshot = await db.ref('users').orderByChild('cell').equalTo(cell).once('value');
-      const userData = snapshot.val();
+      const { userId } = decodedToken;
 
-      if (!userData) {
-        return res.status(401).json({ error: "User not found." });
+      if (userId !== user.id) {
+        return res.status(401).json({ error: "Unauthorized access." });
       }
 
-      const user = Object.values(userData)[0];
-
-      if (!user) {
-        return res.status(401).json({ error: "User not found." });
-      }
-
+      // Refresh token
       const newToken = jwt.sign(
         {
           userId: user.id,
@@ -228,27 +236,13 @@ app.post("/login", loginLimiter, async (req, res) => {
 
       return res.status(200).json({ token: newToken });
     } else {
-      const snapshot = await db.ref('users').orderByChild('cell').equalTo(cell).once('value');
-      const userData = snapshot.val();
-
-      if (!userData) {
-        return res.status(201).json({ error: "User not found." });
-      }
-
-      const userValues = Object.values(userData);
-
-      if (!userValues || userValues.length === 0) {
-        return res.status(401).json({ error: "User not found." });
-      }
-
-      const user = userValues[0];
-
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) {
-        return res.status(202).json({ error: "Incorrect password." });
+        return res.status(401).json({ error: "Incorrect password." });
       }
 
+      // Generate token
       const newToken = jwt.sign(
         {
           userId: user.id,
@@ -262,7 +256,8 @@ app.post("/login", loginLimiter, async (req, res) => {
         { expiresIn: "7D" }
       );
 
-     
+      // Update user's token in the database
+      await db.ref(`users/${user.id}`).update({ token: newToken });
 
       res.status(200).json({ token: newToken });
     }
@@ -271,6 +266,7 @@ app.post("/login", loginLimiter, async (req, res) => {
     return res.status(500).json({ error: "Internal server error. Please try again later." });
   }
 });
+
 
 
 
