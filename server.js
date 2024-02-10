@@ -73,38 +73,30 @@ app.use((req, res, next) => {
 
 // Signup endpoint
 app.post("/signup", async (req, res) => {
-   const postData = req.body;
-  const fullname=postData.name;
-  const cell=postData.phoneNumber;
-  const password=postData.password;
+  const { name, phoneNumber, password } = req.body;
 
   try {
-   
-
-    const cellSnapshot = await db.ref('users').orderByChild('cell').equalTo(cell).once('value');
+    const cellSnapshot = await db.ref('users').orderByChild('cell').equalTo(phoneNumber).once('value');
     if (cellSnapshot.exists()) {
-      return res.status(201).json({ error: "Cell number already registered." });
+      return res.status(409).json({ error: "Cell number already registered." });
     }
 
-   
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const userRef = db.ref('users').push();
-    userRef.set({
-      name: fullName,
-     
-      cell: cell,
-      
-      password: hashedPassword,
-     
+    await userRef.set({
+      name: name,
+      cell: phoneNumber,
+      password: hashedPassword
     });
 
-    res.status(200).json({ message: "User created successfully." });
+    res.status(201).json({ message: "User created successfully." });
   } catch (err) {
     console.error("Error during signup:", err);
     return res.status(500).json({ error: "Internal server error. Please try again later." });
   }
 });
+
 
 const generateRandomNumber = () => {
   const randomNumber = Math.floor(Math.random() * 10000000000000).toString();
