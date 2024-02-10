@@ -129,6 +129,31 @@ app.post('/upload', (req, res) => {
   res.status(200).json({ message: "Post created successfully." });
 });
 
+app.get("/getUserData", async (req, res) => {
+  const token = req.header("Authorization");
+
+  if (!token || !token.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized. Token not provided." });
+  }
+
+  const tokenValue = token.replace("Bearer ", "");
+
+  try {
+    const decodedToken = jwt.verify(tokenValue, secretKey);
+
+    const cell =decodedToken.cell;
+    const name = decodedToken.name;
+
+
+
+    return res.status(200).json({ name: name  , cell: cell}); 
+  } catch (err) {
+    console.error("Error fetching user info:", err);
+    return res.status(500).json({ error: "Internal server error. Please try again later." });
+  }
+});
+
+
 app.post('/uploadText', (req, res) => {
   const postData = req.body;
 
