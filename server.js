@@ -326,7 +326,7 @@ app.post("/login", loginLimiter, async (req, res) => {
       // Update user's token in the database
       await db.ref(`users/${user.id}`).update({ token: newToken ,  stream :user.stream });
 
-      res.status(200).json({ token: newToken });
+      res.status(200).json({ token: newToken ,  stream :user.stream });
     }
   } catch (err) {
     console.error("Error during login:", err);
