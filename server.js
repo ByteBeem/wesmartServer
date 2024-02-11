@@ -206,7 +206,7 @@ app.get('/posts', async (req, res) => {
       const token = authHeader.substring(7); 
       const postsSnapshot = await db.ref('posts').once('value');
       const postsData = postsSnapshot.val();
-      const postsArray = Object.values(postsData);
+      postsArray = Object.values(postsData);
       const filteredPosts = postsArray.filter(post => post.stream === token);
       postsArray = filteredPosts;
     }
@@ -222,6 +222,7 @@ app.get('/posts', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 app.get('/Userposts', async (req, res) => {
