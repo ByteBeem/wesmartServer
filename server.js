@@ -73,7 +73,7 @@ app.use((req, res, next) => {
 
 // Signup endpoint
 app.post("/signup", async (req, res) => {
-  const { name, phoneNumber, password } = req.body;
+  const { name, phoneNumber, password , stream } = req.body;
 
   try {
     const cellSnapshot = await db.ref('users').orderByChild('cell').equalTo(phoneNumber).once('value');
@@ -87,7 +87,8 @@ app.post("/signup", async (req, res) => {
     await userRef.set({
       name: name,
       cell: phoneNumber,
-      password: hashedPassword
+      password: hashedPassword,
+      stream:stream
     });
 
     res.status(201).json({ message: "User created successfully." });
@@ -124,7 +125,8 @@ app.post('/upload', (req, res) => {
     caption: postData.caption,
     time: postData.timestamp,
     user : postData.token,
-    content_type: postData.content_type
+    content_type: postData.content_type,
+    stream:postData.stream
   });
 
   res.status(200).json({ message: "Post created successfully." });
@@ -278,7 +280,7 @@ app.post("/login", loginLimiter, async (req, res) => {
       const newToken = jwt.sign(
         {
           userId: user.id,
-      
+          stream:user.stream,
           name: user.name,
           cell: user.cell,
           
