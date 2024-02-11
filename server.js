@@ -195,10 +195,22 @@ const shuffleArray = (array) => {
 
 app.get('/posts', async (req, res) => {
   try {
-    const postsSnapshot = await db.ref('posts').once('value');
-    const postsData = postsSnapshot.val();
-    const postsArray = Object.values(postsData);
+    const authHeader = req.headers['authorization'];
+    let postsArray;
     
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      const postsSnapshot = await db.ref('posts').once('value');
+      const postsData = postsSnapshot.val();
+      postsArray = Object.values(postsData);
+    } else {
+      const token = authHeader.split(' ')[1];
+      const postsSnapshot = await db.ref('posts').once('value');
+      const postsData = postsSnapshot.val();
+      const postsArray = Object.values(postsData);
+      const filteredPosts = postsArray.filter(post => post.stream === token);
+      postsArray = filteredPosts;
+    }
+
     // Shuffle the array three times
     for (let i = 0; i < 3; i++) {
       shuffleArray(postsArray);
@@ -210,6 +222,7 @@ app.get('/posts', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 app.get('/Userposts', async (req, res) => {
   try {
@@ -311,7 +324,7 @@ app.post("/login", loginLimiter, async (req, res) => {
       );
 
       // Update user's token in the database
-      await db.ref(`users/${user.id}`).update({ token: newToken });
+      await db.ref(`users/${user.id}`).update({ token: newToken ,  stream :user.stream });
 
       res.status(200).json({ token: newToken });
     }
