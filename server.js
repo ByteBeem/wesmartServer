@@ -203,7 +203,7 @@ app.get('/posts', async (req, res) => {
       const postsData = postsSnapshot.val();
       postsArray = Object.values(postsData);
     } else {
-      const token = authHeader.split(' ')[1];
+      const token = authHeader.substring(7); 
       const postsSnapshot = await db.ref('posts').once('value');
       const postsData = postsSnapshot.val();
       const postsArray = Object.values(postsData);
