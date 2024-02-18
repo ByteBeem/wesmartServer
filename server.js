@@ -197,8 +197,17 @@ app.get('/posts', async (req, res) => {
   try {
     const authHeader = req.headers['authorization'];
     let postsArray;
+
+    if (authHeader){
+      const token = authHeader.substring(7); 
+      if (token === ""){
+        const postsSnapshot = await db.ref('posts').once('value');
+      const postsData = postsSnapshot.val();
+      postsArray = Object.values(postsData);
+      };
+    }
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+   else if (!authHeader || !authHeader.startsWith('Bearer ')) {
       const postsSnapshot = await db.ref('posts').once('value');
       const postsData = postsSnapshot.val();
       postsArray = Object.values(postsData);
