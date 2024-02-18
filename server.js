@@ -211,10 +211,7 @@ app.get('/posts', async (req, res) => {
       postsArray = filteredPosts;
     }
 
-    // Shuffle the array three times
-    for (let i = 0; i < 3; i++) {
-      shuffleArray(postsArray);
-    }
+    
     
     res.json(postsArray);
   } catch (error) {
