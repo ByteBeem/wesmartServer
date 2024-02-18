@@ -204,23 +204,24 @@ app.get('/posts', async (req, res) => {
         const postsSnapshot = await db.ref('posts').once('value');
       const postsData = postsSnapshot.val();
       postsArray = Object.values(postsData);
-      };
-    }
-    
-   else if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      const postsSnapshot = await db.ref('posts').once('value');
-      const postsData = postsSnapshot.val();
-      postsArray = Object.values(postsData);
-    } else {
+      }else {
       const token = authHeader.substring(7); 
       const postsSnapshot = await db.ref('posts').once('value');
       const postsData = postsSnapshot.val();
       postsArray = Object.values(postsData);
       const filteredPosts = postsArray.filter(post => post.stream === token);
       postsArray = filteredPosts;
+      }
     }
+    
+   else{
+      const postsSnapshot = await db.ref('posts').once('value');
+      const postsData = postsSnapshot.val();
+      postsArray = Object.values(postsData);
+    } 
+    
 
-    // Sort postsArray in descending order based on timestamp
+
     postsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
     res.json(postsArray);
