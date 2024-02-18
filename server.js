@@ -132,6 +132,27 @@ app.post('/upload', (req, res) => {
   res.status(200).json({ message: "Post created successfully." });
 });
 
+app.post('/PostComments', (req, res) => {
+  const postData = req.body;
+
+  
+  if (!postData.caption) {
+    postData.caption = "";
+  }
+  
+  const userRef = db.ref('comments').push();
+  userRef.set({
+    imageUrl: postData.imageUrl,
+    caption: postData.caption,
+    time: postData.timestamp,
+    
+    content_type: postData.content_type,
+    postId:postData.postId
+  });
+
+  res.status(200).json({ message: "Post created successfully." });
+});
+
 app.get("/getUserData", async (req, res) => {
   const token = req.header("Authorization");
 
@@ -162,7 +183,25 @@ app.get("/getUserData", async (req, res) => {
   }
 });
 
+app.post('/TextComment', (req, res) => {
+  const postData = req.body;
 
+  
+  if (!postData.caption) {
+    postData.caption = "";
+  }
+  
+  const userRef = db.ref('comments').push();
+  userRef.set({
+    
+    caption: postData.caption,
+    time: postData.timestamp,
+    postId : postData.postId,
+    content_type: postData.content_type
+  });
+
+  res.status(200).json({ message: "Post created successfully." });
+});
 
 app.post('/uploadText', (req, res) => {
   const postData = req.body;
@@ -227,6 +266,31 @@ app.get('/posts', async (req, res) => {
     res.json(postsArray);
   } catch (error) {
     console.error("Error fetching posts:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/comments', async (req, res) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    let commentsArray = [];
+
+    if (authHeader) {
+      const postId = authHeader.substring(7); 
+      
+      
+      const commentsSnapshot = await db.ref('comments').orderByChild('postId').equalTo(postId).once('value');
+      const commentsData = commentsSnapshot.val();
+      if (commentsData) {
+        commentsArray = Object.values(commentsData); 
+      }
+    }
+
+    commentsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); 
+    
+    res.json(commentsArray); 
+  } catch (error) {
+    console.error("Error fetching comments:", error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
