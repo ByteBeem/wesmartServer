@@ -211,6 +211,7 @@ app.get('/posts', async (req, res) => {
       postsArray = filteredPosts;
     }
 
+    // Sort postsArray in descending order based on timestamp
     postsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
     res.json(postsArray);
@@ -219,6 +220,7 @@ app.get('/posts', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
