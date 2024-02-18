@@ -211,7 +211,7 @@ app.get('/posts', async (req, res) => {
       postsArray = filteredPosts;
     }
 
-    
+    postsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
     res.json(postsArray);
   } catch (error) {
