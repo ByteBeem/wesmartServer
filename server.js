@@ -237,29 +237,25 @@ app.get('/posts', async (req, res) => {
     const authHeader = req.headers['authorization'];
     let postsArray;
 
-    if (authHeader){
+    if (authHeader) {
       const token = authHeader.substring(7); 
-      if (token === ""){
+      if (token === "") {
         const postsSnapshot = await db.ref('posts').once('value');
-      const postsData = postsSnapshot.val();
-      postsArray = Object.values(postsData);
-      }else {
-      const token = authHeader.substring(7); 
-      const postsSnapshot = await db.ref('posts').once('value');
-      const postsData = postsSnapshot.val();
-      postsArray = Object.values(postsData);
-      const filteredPosts = postsArray.filter(post => post.stream === token);
-      postsArray = filteredPosts;
+        const postsData = postsSnapshot.val();
+        postsArray = Object.keys(postsData).map(key => ({ id: key, ...postsData[key] }));
+      } else {
+        const postsSnapshot = await db.ref('posts').once('value');
+        const postsData = postsSnapshot.val();
+        const filteredPosts = Object.keys(postsData)
+          .filter(key => postsData[key].stream === token)
+          .map(key => ({ id: key, ...postsData[key] }));
+        postsArray = filteredPosts;
       }
-    }
-    
-   else{
+    } else {
       const postsSnapshot = await db.ref('posts').once('value');
       const postsData = postsSnapshot.val();
-      postsArray = Object.values(postsData);
-    } 
-    
-
+      postsArray = Object.keys(postsData).map(key => ({ id: key, ...postsData[key] }));
+    }
 
     postsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
