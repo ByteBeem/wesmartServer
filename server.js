@@ -217,7 +217,7 @@ app.post('/uploadText', (req, res) => {
     caption: postData.caption,
     time: postData.timestamp,
     user : postData.token,
-    content_type: postData.content_type
+    content_type: postData.content_type,
     stream:postData.stream
   });
 
@@ -225,13 +225,7 @@ app.post('/uploadText', (req, res) => {
 });
 
 
-const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-};
+
 
 app.get('/posts', async (req, res) => {
   try {
@@ -311,10 +305,8 @@ app.get('/Userposts', async (req, res) => {
       .filter(key => postsData[key].user === token)
       .map(key => ({ id: key, ...postsData[key] }));
 
-    // Shuffle the filtered posts
-    shuffleArray(filteredPosts);
-
-    // Send the shuffled posts
+    filteredPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
     res.json(filteredPosts);
   } catch (error) {
     console.error("Error fetching posts:", error);
