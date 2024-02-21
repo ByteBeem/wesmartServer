@@ -218,6 +218,7 @@ app.post('/uploadText', (req, res) => {
     time: postData.timestamp,
     user : postData.token,
     content_type: postData.content_type
+    stream:postData.stream
   });
 
   res.status(200).json({ message: "Post created successfully." });
