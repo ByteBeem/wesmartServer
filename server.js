@@ -150,7 +150,7 @@ app.post('/PostComments', (req, res) => {
     postId:postData.postId
   });
 
-  res.status(200).json({ message: "Post created successfully." });
+  res.status(200).json({ message: "Post created successfully.", data: postData });
 });
 
 app.get("/getUserData", async (req, res) => {
@@ -200,7 +200,7 @@ app.post('/TextComment', (req, res) => {
     content_type: postData.content_type
   });
 
-  res.status(200).json({ message: "Post created successfully." });
+  res.status(200).json({ message: "Post created successfully.", data: postData });
 });
 
 app.post('/uploadText', (req, res) => {
