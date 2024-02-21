@@ -304,23 +304,22 @@ app.get('/Userposts', async (req, res) => {
     const token = authHeader.substring(7); 
     const postsSnapshot = await db.ref('posts').once('value');
     const postsData = postsSnapshot.val();
-    const postsArray = Object.values(postsData);
 
-    // Filter posts based on token
-    const filteredPosts = postsArray.filter(post => post.user === token);
+    // Filter posts by user token
+    const filteredPosts = Object.keys(postsData)
+      .filter(key => postsData[key].user === token)
+      .map(key => ({ id: key, ...postsData[key] }));
 
     // Shuffle the filtered posts
-    for (let i = 0; i < 3; i++) {
-      shuffleArray(filteredPosts);
-    }
+    shuffleArray(filteredPosts);
 
+    // Send the shuffled posts
     res.json(filteredPosts);
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 
 
